@@ -76,7 +76,7 @@ unsigned int min_pos_init = 0;
 
 void setup() {
   // Open serial communications and wait for port to open (PC communication)
-  Serial.begin(57600);
+  Serial.begin(115200);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -393,8 +393,8 @@ void parse_command(String command){
        
     if(command.startsWith("SET")){
       if (get_string_value(command,';', NUM_SERVOS).length()){
-        for(int i=0; i<NUM_SERVOS; i++){
-          float val = get_string_value(command,';', i+1).toFloat();
+        for(int i=0; i<NUM_SERVOS+1; i++){
+          float val = get_string_value(command,';', i+2).toFloat();
           out_str += '\t'+String(val,3);
           val = convert_units_in(val);
           out_str += '\t'+String(val,3);
@@ -407,8 +407,8 @@ void parse_command(String command){
         new_setpoint = true;
         out_str+="New ";
       }
-      else if (get_string_value(command,';', 1).length()){
-        float allset=get_string_value(command,';', 1).toFloat();
+      else if (get_string_value(command,';', 2).length()){
+        float allset=get_string_value(command,';', 2).toFloat();
         allset = convert_units_in(allset);
 
         for(int i=0; i<NUM_SERVOS; i++){
