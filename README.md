@@ -22,9 +22,6 @@ int servo_id[] = {1,2,3,4,5,6};
 ## Usage
 Send serial commands using a `[COMMAND];[ARG];[ARG]...` structure. This struture is described in detail in the [documentation for Ctrl-P](https://ctrl-p.cbteeple.com/latest/firmware/firmware_commands), but this servo program uses a different command set.
 
-## Safety Commands:
-
-
 ## Commands
 
 ### Main Commands:
@@ -40,7 +37,26 @@ Send serial commands using a `[COMMAND];[ARG];[ARG]...` structure. This struture
 - **CONT** - Set the continuous operation mode (i.e. torque-determined stop vs. continuous torque)
   - **CONT;_[#1]_** - Set the continuous operation mode of the servos to one value. #1 (`bool`) is the desired mode.
   - **CONT;_[#1-#N]_** - Set the continuous operation mode of the servos. #1-#N (`bool`) are the desired torques.
-  
+
+
+### Safety Commands:
+- **MAX** - Set the maximum position of the servos (in direct units)
+  - **MAX;_[#1]_** - Set the maximum position of the servos to one value. #1 (`int`) is the desired maximum position.
+  - **MAX;_[#1-#N]_** - Set the maximum position of the servos. #1-#N (`int`) are the desired maximum positions. 
+- **MIN** - Set the maximum position of the servos (in direct units)
+  - **MIN;_[#1]_** - Set the minimum position of the servos to one value. #1 (`int`) is the desired minimum position.
+  - **MIN;_[#1-#N]_** - Set the minimum position of the servos. #1-#N (`int`) are the desired minimum positions. 
+
+### Communication Commands
+- **ON** - Turn on live data output
+  - **ON** - (No Args)
+- **OFF** - Turn off live data output
+  - **OFF** - (No Args)
+- **UNITS** - Set the output units 
+  - **UNITS;_[#1]_** - #1 (`int`) is the unit type: (0 = direct servo units, 1 = angle (degrees), 2 = angle (radians), 3 = gripper width (mm)). Gripper width units are calculated for the [Trossen Phantom Parallel Gripper](https://www.trossenrobotics.com/p/phantomx-parallel-ax12-gripper.aspx)
+- **ECHO** - Set the state of command echos
+  - **ECHO;_[#1]_** - #1 is the echo state (0=off, 1=on)
+
 ### Servo Setup Commands
 - **ID** - Set the Servo IDs that you want to use
   - **ID;_[#1-#N]_** - Set the servo IDs. #1-#N (`int`) are the desired IDs. 
@@ -60,17 +76,6 @@ Send serial commands using a `[COMMAND];[ARG];[ARG]...` structure. This struture
   - **FRIMWARE** - (No Args)
 - **MODEL** - Get the model number of all servos
   - **MODEL** - (No Args)
-
-### Communication Commands
-- **ON** - Turn on live data output
-  - **ON** - (No Args)
-- **OFF** - Turn off live data output
-  - **OFF** - (No Args)
-- **UNITS** - Set the output units 
-  - **UNITS;_[#1]_** - #1 (`int`) is the unit type: (0 = direct servo units, 1 = angle (degrees), 2 = angle (radians), 3 = gripper width (mm)). Gripper width units are calculated for the [Trossen Phantom Parallel Gripper](https://www.trossenrobotics.com/p/phantomx-parallel-ax12-gripper.aspx)
-- **ECHO** - Set the state of command echos
-  - **ECHO;_[#1]_** - #1 is the echo state (0=off, 1=on)
-
   
 ### Other Commands:
 - **LED** - Set the LED state of a servo
