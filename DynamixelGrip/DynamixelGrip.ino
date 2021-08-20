@@ -76,12 +76,13 @@ unsigned int min_pos_init = 0;
 
 void setup() {
   // Open serial communications and wait for port to open (PC communication)
-  Serial.begin(115200);
+  Serial.setTimeout(30);
+  Serial.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
 
-  Serial.println("_Starting COM!");
+  Serial.println("_StartingCOM!");
 
   // Start the communication with the dynamixels
   dxlCom.begin(57600);
@@ -114,6 +115,8 @@ void loop()
 {
   // Run the move if there's a new setpoint
   if (new_setpoint){
+    new_setpoint=false;
+    reset_moving();
     // Set the new goal positions
     for(int i=0; i<NUM_SERVOS; i++){
       dxlCom.setGoalPosition(servo_id[i],setpoint[i]);
@@ -165,9 +168,11 @@ void loop()
       curr_time = millis();
       send_data(0);
       send_data(1);
+      bool new_data = recvWithEndMarker();
+      if (new_data){
+        break;
+      }
     }
-    reset_moving();
-    new_setpoint=false;
   }
   else{
     for(int i=0; i<NUM_SERVOS; i++){
@@ -177,7 +182,8 @@ void loop()
   }
 
   // check for new serial messages
-  check_serial();
+  //check_serial();
+  recvWithEndMarker();
 
   
   curr_time = millis();
@@ -359,6 +365,7 @@ Handle Imcomming Serial Commands
 
 String command="";
 // Check for new serial data
+/*
 String check_serial() {
   // Get new command
   while (Serial.available() >0) {
@@ -371,13 +378,59 @@ String check_serial() {
     if (inChar == '\n') {
       command.toUpperCase();
       parse_command(command);
-      command="";  
+      command=""; 
     }
   }
 
   return command;
 }
 
+*/
+
+bool check_serial() {
+  //unsigned long start_time = micros();
+  delay(2);
+  while (Serial.available()) {
+    //command = Serial.readStringUntil('\n');
+    //command.toUpperCase();
+    //parse_command(command);
+    // get the new byte:
+    byte byte_str = Serial.read();
+    char inChar = (char)byte_str;
+    // Add new byte to the inputString:
+    command += inChar;
+    // If the incoming character is a newline, set a flag so we can process it
+    if (inChar == '\n') {
+      command.toUpperCase();
+      parse_command(command);
+      command=""; 
+      Serial.flush();
+      return true;
+    }
+  }
+  return false;
+}
+
+
+bool recvWithEndMarker() {
+  char endMarker = '\n';
+  char rc;
+  
+  while (Serial.available() > 0) {
+    rc = Serial.read();
+
+    if (rc != endMarker) {
+      command += rc;
+    }
+    else {
+      command.toUpperCase();
+      parse_command(command);
+      command="";
+      return true;
+    }
+  }
+  return false;
+}
 
 // Send a string via serial
 void send_string(String bc_string){
@@ -395,9 +448,7 @@ void parse_command(String command){
       if (get_string_value(command,';', NUM_SERVOS).length()){
         for(int i=0; i<NUM_SERVOS+1; i++){
           float val = get_string_value(command,';', i+2).toFloat();
-          out_str += '\t'+String(val,3);
           val = convert_units_in(val);
-          out_str += '\t'+String(val,3);
 
           if (val<=max_pos[i] & val>=min_pos[i] ){
             setpoint[i] = val;
@@ -680,7 +731,8 @@ void parse_command(String command){
 
     
     else{
-      out_str = "Unrecognized Command";  
+      out_str = "Unrecognized Command: ";  
+      out_str += command;
     }
 
     if (echo_global or echo_one_time){
