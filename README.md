@@ -5,19 +5,24 @@ A program for controlling several Dynamixel servos with a standard communication
 ## Dependencies:
 - [HalfDuplexSerial-for-Arduino](https://github.com/akira215/HalfDuplexSerial-for-Arduino) library (_required_) - For communicating with the servos via half-duplex serial
 - [DynamixelArduino](https://github.com/akira215/DynamixelArduino) library (_required_) - For controlling dynamixel servos as nice objects.
+- [Ax-12A-servo-library](https://github.com/jumejume1/AX-12A-servo-library) library (_optional_) - For connecting to servos via hardware serial (used for changing baud rates)
 
 ## Setup
-1. Define the comm pin to use (since dynamixels can be daisy-chained). This pin might need to have interrupt capabillities to work correctly.
-2. Define the number of servos
-3. Define a list of servo ID's. These are the internal ID's of the servos) (what the servos think they are). By default the ID is always "1" on new servos.
+1. Use "DynamixelBaudSwitch" to switch the baud rate of your servo to **57600**.
+	- Be sure to connect the data line of the servo to the TX pin on your arduino.
+	- Upload the program to the arduino. That's it.
+2. Upload the "DynamixelGrip" firmware.
+	1. Define the comm pin to use (since dynamixels can be daisy-chained). This pin needs to have interrupt capabillities to work correctly.
+	2. Define the number of servos
+	3. Define a list of servo ID's. These are the internal ID's of the servos) (what the servos think they are). By default the ID is always "1" on new servos.
 
 ```cpp
 int servo_comm_pin = 2;
 #define NUM_SERVOS 6
 int servo_id[] = {1,2,3,4,5,6};
 ```
-4. Upload the program to an Arduino (I used an Arduino Nano).
-5. Set up your servo with 12V power and 
+	4. Upload the program to an Arduino (I used an Arduino Nano).
+	5. Set up your servo with 12V power and reset the arduino (power cycle).
 
 ## Usage
 Send serial commands using a `[COMMAND];[ARG];[ARG]...` structure. This struture is described in detail in the [documentation for Ctrl-P](https://ctrl-p.cbteeple.com/latest/firmware/firmware_commands), but this servo program uses a different command set.
