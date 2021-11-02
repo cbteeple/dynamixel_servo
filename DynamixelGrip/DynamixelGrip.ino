@@ -1,35 +1,21 @@
 /*
-DynamixelMxMonitorBlock.ino
-written by Akira
+DynamixelGrip.ino
+  written by cbteeple
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+  *****************************************************************************
+  Decription:
+  This library enables simple control of a dynamixel servo via commands.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+  Dependencies:
+   - SoftHalfDuplexSerial library (https://github.com/akira215/HalfDuplexSerial-for-Arduino)
+   - DynamixelAx library (https://github.com/akira215/DynamixelArduino)
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
- *****************************************************************************
- Decription:
- This library implement all the required operation to drive Dynamixel servo,
- Please visit http://support.robotis.com/en/product/dynamixel/dxl_communication.htm to understand Dynamixel communication protocol
-
- Hardware:
-  - This example use softHalfDuplexSerial library, check that the connected data pin support change interrupt
-  - Pin 8 is used in this example to communicate with dynamixel servos (only one wire)
-  - Check that the board is properly grounded with dynamixel power supply.
-  - Please check the servo baudrate, it has been set to 57 600bps here.
-  - Take care that the defaut servo ID is 1.
-  In this example, we will wait after each Dynamixel command the answer of the servo.
-  The code is simplier than in non blocking implemantation, but it will block any other code (except interrupt) during this time.
+  Hardware:
+   - This example uses the SoftHalfDuplexSerial library, so check that the connected data pin supports change interrupts
+   - Check that the board is properly grounded with dynamixel power supply.
+   - The servo's baudrate must be changed from its default. Use the "DynamixelBaudSwitch.ino" sketch to switch it from 1000000bps to 57600bps.
 */
+
 #include <SoftHalfDuplexSerial.h>
 #include <DynamixelAx.h>
 
