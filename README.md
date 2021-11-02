@@ -16,11 +16,11 @@ A program for controlling several Dynamixel servos with a standard communication
 	2. Define the number of servos
 	3. Define a list of servo ID's. These are the internal ID's of the servos) (what the servos think they are). By default the ID is always "1" on new servos.
 
-```cpp
-int servo_comm_pin = 2;
-#define NUM_SERVOS 6
-int servo_id[] = {1,2,3,4,5,6};
-```
+	```cpp
+	int servo_comm_pin = 2;
+	#define NUM_SERVOS 6
+	int servo_id[] = {1,2,3,4,5,6};
+	```
 	4. Upload the program to an Arduino (I used an Arduino Nano).
 	5. Set up your servo with 12V power and reset the arduino (power cycle).
 
