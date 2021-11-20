@@ -19,7 +19,8 @@ DynamixelGrip.ino
 #include <SoftHalfDuplexSerial.h>
 #include <DynamixelAx.h>
 
-#define NUM_SERVOS 1
+#define NUM_SERVOS 5
+
 int servo_id[] = {1,2,3,4,5,6};
 int servo_comm_pin = 2;
 
@@ -40,7 +41,7 @@ bool         cont_hold[NUM_SERVOS];
 
 bool new_setpoint = false;
 bool echo_global = true;
-unsigned int units = 3;
+unsigned int units = 1;
 bool isMoving[NUM_SERVOS];
 unsigned long curr_time = 0;
 unsigned long last_time = 0;
@@ -56,8 +57,8 @@ bool all_moving();
 int  get_result();
 
 
-unsigned int pos_init = 400;
-unsigned int max_pos_init = 512;
+unsigned int pos_init = 512;
+unsigned int max_pos_init = 1023;
 unsigned int min_pos_init = 0;
 
 void setup() {
@@ -115,17 +116,19 @@ void loop()
     // Wait until no more motion occurs
     int final_pos = 0; 
     while (any_moving()){
+      unsigned short error = DXL_ERR_SUCCESS;
+      int result = -1;
       for(int i=0; i<NUM_SERVOS; i++){
         if(isMoving[i]){
-          unsigned short error = DXL_ERR_SUCCESS;
           while(dxlCom.isBusy()); // waiting the status return delay time
           dxlCom.readPresentPosition(servo_id[i]);
           //Serial.print("Pos : ");
           while(!dxlCom.dxlDataReady());        // waiting the answer of servo
+          result = dxlCom.readDxlResult();
           error = dxlCom.readDxlError();
           if(error!=DXL_ERR_SUCCESS) // readDxlResult should always be called before readDxlData
             printDxlError(error);
-          curr_pos[i] = dxlCom.readDxlResult();
+          curr_pos[i] = result;
           //Serial.print(curr_pos[i]);
           //Serial.print('\t');
       
@@ -133,6 +136,7 @@ void loop()
           dxlCom.readPresentLoad(servo_id[i]);
           //Serial.print("Load : ");
           while(!dxlCom.dxlDataReady());        // waiting the answer of servo
+          result = dxlCom.readDxlResult();
           error = dxlCom.readDxlError();
           if(error!=DXL_ERR_SUCCESS) // readDxlResult should always be called before readDxlData
             printDxlError(error);
@@ -141,14 +145,18 @@ void loop()
           while(dxlCom.isBusy()); // waiting the status return delay time (for testing if it is moving)
           dxlCom.isMoving(servo_id[i]);
           while(!dxlCom.dxlDataReady());        // waiting the answer of servo
+          result = dxlCom.readDxlResult();
           error = dxlCom.readDxlError();
           if(error!=DXL_ERR_SUCCESS) // readDxlResult should always be called before readDxlData
             printDxlError(error);
-          isMoving[i] = dxlCom.readDxlResult();
+          isMoving[i] = result;
         }
 
         if (!isMoving[i] & !cont_hold[i]){
           dxlCom.setGoalPosition(servo_id[i],curr_pos[i]);
+          while(!dxlCom.dxlDataReady());        // waiting the answer of servo
+          result = dxlCom.readDxlResult();
+          error = dxlCom.readDxlError();
         }
       }
       curr_time = millis();
@@ -327,7 +335,6 @@ void send_data(int type){
       out_str += '\t';
       out_str += "0";
       for(int i=0; i<NUM_SERVOS; i++){
-        out_str += '\t'+String(setpoint[i]);
         out_str += '\t'+String(convert_units_out(setpoint[i]));
       }
     break;
@@ -335,7 +342,6 @@ void send_data(int type){
       out_str += '\t';
       out_str += "1";
       for(int i=0; i<NUM_SERVOS; i++){
-        out_str += '\t'+String(curr_pos[i]);
         out_str += '\t'+String(convert_units_out(curr_pos[i]));
       }
     break;
@@ -431,7 +437,7 @@ void parse_command(String command){
     bool echo_one_time=false;
        
     if(command.startsWith("SET")){
-      if (get_string_value(command,';', NUM_SERVOS).length()){
+      if (get_string_value(command,';', NUM_SERVOS+1).length()){
         for(int i=0; i<NUM_SERVOS+1; i++){
           float val = get_string_value(command,';', i+2).toFloat();
           val = convert_units_in(val);
