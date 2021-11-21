@@ -160,8 +160,10 @@ void loop()
         }
       }
       curr_time = millis();
-      send_data(0);
-      send_data(1);
+      if (data_on){
+        send_data(0);
+        send_data(1);
+      }
       bool new_data = recvWithEndMarker();
       if (new_data){
         break;
@@ -391,7 +393,7 @@ bool check_serial() {
     char inChar = (char)byte_str;
     // Add new byte to the inputString:
     command += inChar;
-    // If the incoming character is a newline, set a flag so we can process it
+    // If the incoming character is a newline, process the command
     if (inChar == '\n') {
       command.toUpperCase();
       parse_command(command);
