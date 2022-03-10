@@ -208,10 +208,10 @@ float pi = 3.14159;
  */
 int angle_to_pos(float angle, bool use_degrees){
   if (use_degrees){
-    return 512-int(angle*1024/300.0);
+    return 512-int((90-angle)*1024/300.0);
   }
   else{
-    return 512-int(angle*1024/5.23599);
+    return 512-int((pi/2-angle)*1024/5.23599);
   }
 }
 
@@ -225,10 +225,10 @@ int angle_to_pos(float angle){
  */
 float pos_to_angle(int pos, bool use_degrees){
   if (use_degrees){
-    return (512-pos)*300.0/1024.0;
+    return 90.0-(512-pos)*300.0/1024.0;
   }
   else{
-    return (512-pos)*5.23599/1024.0;
+    return pi/2-(512-pos)*5.23599/1024.0;
   }
 }
 
