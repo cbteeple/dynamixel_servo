@@ -19,12 +19,12 @@ DynamixelGrip.ino
 #include <SoftHalfDuplexSerial.h>
 #include <DynamixelAx.h>
 
-#define NUM_SERVOS 5
+#define NUM_SERVOS 1
 
 int servo_id[] = {1,2,3,4,5,6};
 int servo_comm_pin = 2;
 
-softHalfDuplexSerial port(servo_comm_pin); // data pin 8
+softHalfDuplexSerial port(servo_comm_pin);
 dxlAx dxlCom(&port);
 
 String _readString;         // Input string from serial monitor
@@ -440,17 +440,18 @@ void parse_command(String command){
        
     if(command.startsWith("SET")){
       if (get_string_value(command,';', NUM_SERVOS+1).length()){
-        for(int i=0; i<NUM_SERVOS+1; i++){
+        for(int i=0; i<NUM_SERVOS; i++){
           float val = get_string_value(command,';', i+2).toFloat();
           val = convert_units_in(val);
 
-          if (val<=max_pos[i] & val>=min_pos[i] ){
+          if ((val<=max_pos[i]) & (val>=min_pos[i]) ){
             setpoint[i] = val;
           }
 
         }
         new_setpoint = true;
-        out_str+="New ";
+        out_str+="New";
+        
       }
       else if (get_string_value(command,';', 2).length()){
         float allset=get_string_value(command,';', 2).toFloat();
@@ -467,10 +468,13 @@ void parse_command(String command){
       }
       out_str+="SET: ";
       for(int i=0; i<NUM_SERVOS; i++){
-        out_str += '\t'+String(convert_units_out(setpoint[i]));
-      }
-      
+        if(i>0){
+         out_str += '\t';
+        }
+        out_str += String(convert_units_out(setpoint[i]));
+      }      
     }
+    
     else if(command.startsWith("SPEED")){
       if (get_string_value(command,';', NUM_SERVOS).length()){
         for(int i=0; i<NUM_SERVOS; i++){
@@ -491,7 +495,10 @@ void parse_command(String command){
       for(int i=0; i<NUM_SERVOS; i++){
         dxlCom.setMovingSpeed(servo_id[i],speed[i]);
         //printDxlResult();
-        out_str += '\t'+String(speed[i]);
+        if(i>0){
+         out_str += '\t';
+        }
+        out_str += String(speed[i]);
       }
       
     }
@@ -516,7 +523,10 @@ void parse_command(String command){
       for(int i=0; i<NUM_SERVOS; i++){
         dxlCom.setTorqueLimit(servo_id[i],torque[i]);
         //printDxlResult();
-        out_str += '\t'+String(torque[i]);
+        if(i>0){
+         out_str += '\t';
+        }
+        out_str += String(torque[i]);
       }
       
     }
@@ -539,7 +549,10 @@ void parse_command(String command){
       }
       out_str+="CONT: ";
       for(int i=0; i<NUM_SERVOS; i++){
-        out_str += '\t'+String(cont_hold[i]);
+        if(i>0){
+         out_str += '\t';
+        }
+        out_str += String(cont_hold[i]);
       }
       
     }
@@ -658,23 +671,28 @@ void parse_command(String command){
     else if(command.startsWith("MAX")){
       if (get_string_value(command,';', NUM_SERVOS).length()){
         for(int i=0; i<NUM_SERVOS; i++){
-          max_pos[i] = get_string_value(command,';', i+1).toInt();
+          float val=get_string_value(command,';', i+1).toFloat();
+          max_pos[i] = convert_units_in(val);
+          
           
         }
         out_str+="New ";
       }
       else if (get_string_value(command,';', 1).length()){
-        float allset=get_string_value(command,';', 1).toInt();
+        float allset=get_string_value(command,';', 1).toFloat();
 
         for(int i=0; i<NUM_SERVOS; i++){
-          max_pos[i] = allset;
+          max_pos[i] = convert_units_in(allset);
           
         }
         out_str+="New ";
       }
       out_str+="MAX: ";
       for(int i=0; i<NUM_SERVOS; i++){
-        out_str += '\t'+String(max_pos[i]);
+        if(i>0){
+         out_str += '\t';
+        }
+        out_str += String(max_pos[i]);
       }
       
     }
@@ -683,23 +701,27 @@ void parse_command(String command){
     else if(command.startsWith("MIN")){
       if (get_string_value(command,';', NUM_SERVOS).length()){
         for(int i=0; i<NUM_SERVOS; i++){
-          min_pos[i] = get_string_value(command,';', i+1).toInt();
+          float val=get_string_value(command,';', i+1).toFloat();
+          min_pos[i] = convert_units_in(val);
           
         }
         out_str+="New ";
       }
       else if (get_string_value(command,';', 1).length()){
-        float allset=get_string_value(command,';', 1).toInt();
+        float allset=get_string_value(command,';', 1).toFloat();
 
         for(int i=0; i<NUM_SERVOS; i++){
-          min_pos[i] = allset;
+          min_pos[i] = convert_units_in(allset);
           
         }
         out_str+="New ";
       }
       out_str+="MIN: ";
       for(int i=0; i<NUM_SERVOS; i++){
-        out_str += '\t'+String(min_pos[i]);
+        if(i>0){
+         out_str += '\t';
+        }
+        out_str += String(min_pos[i]);
       }
       
     }
